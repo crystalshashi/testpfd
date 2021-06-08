@@ -1,0 +1,23 @@
+# Default JVM memory options for PingFederate
+#
+# Each non-commented and non-empty line will be added as a Java option when PingFederate is started.
+# Comments can be added to this file by starting a line with the # character.
+#
+
+#Minimum heap size
+#-Xms8192m
+#Maximum heap size
+#-Xmx8192m
+#Minimum size for the Young Gen space
+#-XX:NewSize=3072m
+#Maximum size for the Young Gen space
+#-XX:MaxNewSize=3072m
+#Use the parallel garbage collector
+#-XX:+UseParallelGC
+#Use parallel garbage collection for full collections
+#-XX:-UseParallelOldGC
+
+
+#Performance related args
+#-javaagent:/app/performance/bin/jmxtrans-agent.jar=/app/performance/bin/jmxtrans-agent-accounts.xml
+#-javaagent:/app/performance/bin/jolokia-agent.jar=host=*,port=8778

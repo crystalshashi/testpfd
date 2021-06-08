@@ -1,0 +1,13 @@
+ID=79320
+Organization=Digital Insight Corporation
+Product=PingFederate
+Version=7.1
+IssueDate=2016-03-31
+EnforcementType=3
+ExpirationDate=2017-03-30
+Tier=Subscription
+SaasProvisioning=true
+WSTrustSTS=true
+OAuth=true
+SignCode=FF07
+Signature=302D02140894B6F7A52EB9F833DEF49B6ADA55F38849FB9102150094C6F4A0EA092CC7F719AE02D5A323B1CD2DCED3

@@ -1,0 +1,13 @@
+ID=1648415
+Organization=NCR Corporation
+Product=PingFederate
+Version=9.3
+IssueDate=2020-03-24
+EnforcementType=3
+ExpirationDate=2021-03-30
+Tier=Subscription
+SaasProvisioning=true
+WSTrustSTS=true
+OAuth=true
+SignCode=FF07
+Signature=302C02145766C73E961D8733DA78025A0AC913CCF282FC2E02144D5271AC03EE028AA29142AF066A487B5FC7AAF8

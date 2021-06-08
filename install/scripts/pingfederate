@@ -1,0 +1,117 @@
+#!/bin/bash
+
+PID_FILE=/usr/local/pingfederate/bin/pingfederate.pid
+PROG=`basename $0`
+LOG_DIR=/app/pingfederate/logs
+DATA_ZIP=/usr/local/config/configs/data.zip
+PINGFEDERATE_INSTALL_DIR=/usr/local/pingfederate
+
+start() {
+
+        mkdir -p $LOG_DIR
+        touch $LOG_DIR/server.log
+        chown app:appadmin $LOG_DIR/server.log
+        echo "Starting PingFederate..."
+        su - app -c '/usr/local/pingfederate/sbin/pingfederate-run.sh'
+
+
+        tail -F $LOG_DIR/server.log | while read LINE
+        do
+                [[ "$LINE" =~ (.*INFO.*Server.*Started @.*ms) ]] && pkill -9 -P $$ tail
+        done
+
+        status
+}
+
+simplestart() {
+
+        mkdir -p $LOG_DIR
+        touch $LOG_DIR/server.log
+        chown app:appadmin $LOG_DIR/server.log
+
+        echo "Starting PingFederate..."
+        su - app -c '/usr/local/pingfederate/sbin/pingfederate-run.sh'
+
+        tail -F $LOG_DIR/server.log | while read LINE
+        do
+                [[ "$LINE" =~ (.*INFO.*Server.*Started @.*ms) ]] && pkill -9 -P $$ tail
+        done
+
+        status
+}
+
+stop() {
+        echo "Stopping PingFederate..."
+        su - app -c '/usr/local/pingfederate/sbin/pingfederate-shutdown.sh'
+
+        for SECONDS in 30 60 90 120 150 180
+        do
+                status >/dev/null 2>&1
+                STOPPED=$?
+                if [ $STOPPED ]; then
+                        break
+                fi
+        done
+
+        status
+}
+
+restart() {
+        stop
+
+        # To protect against any services that are not stopped,
+        # uncomment the following command.
+        # (Warning: this kills all Java instances running as
+        # app.)
+        #   su - app -c 'killall java'
+
+        simplestart
+}
+
+status() {
+        PID=
+        RUNNING=1
+
+        if [ -e $PID_FILE ]
+        then
+                PID=$(<$PID_FILE)
+
+                if [ $PID ]
+                then
+                        ps -p $PID | grep $PID >/dev/null 2>&1
+                        RUNNING=$?
+                fi
+        fi
+
+        if [ $RUNNING -eq 0 ]
+        then
+                echo "$PROG (pid $PID) is running..."
+        else
+                echo "$PROG is not running."
+        fi
+
+        return $RUNNING
+}
+
+case "$1" in
+        start)
+                start
+                ;;
+        stop)
+                stop
+                ;;
+        restart)
+                restart
+                ;;
+        status)
+                status
+                ;;
+        simplestart)
+				simplestart
+				;;
+        *)
+                echo "Usage: $PROG {start|stop|restart|status|simplestart}"
+                exit 1
+esac
+
+exit 0

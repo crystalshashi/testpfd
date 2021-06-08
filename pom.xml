@@ -1,0 +1,301 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- ~ Copyright (c) 2007-2013 Digital Insight, Inc. All rights reserved. 
+	~ Unauthorized reproduction is a violation of applicable law. ~ This material 
+	contains certain confidential and proprietary ~ information and trade secrets 
+	of Digital Insight. -->
+
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	<groupId>com.digitalinsight.pingfederate</groupId>
+	<artifactId>pingfederate-server</artifactId>
+	<version>1.0.12-SNAPSHOT</version>
+	<name>PFD</name>
+	<packaging>pom</packaging>
+
+	<properties>
+<!-- 		<release_deploy_repo>https://ncr.jfrog.io/artifactory/digitalbanking-maven-group</release_deploy_repo>
+        <snapshot_deploy_repo>https://ncr.jfrog.io/artifactory/digitalbanking-maven-group</snapshot_deploy_repo>
+        <plugin_repo>https://ncr.jfrog.io/artifactory/digitalbanking-maven-group</plugin_repo>
+        <central_repo>https://ncr.jfrog.io/artifactory/digitalbanking-maven-group</central_repo> -->
+        <nexus_server>d2d-buildrepo.prd1.diginsite.net</nexus_server>
+        <central_repo>http://${nexus_server}:8080/nexus/content/groups/public/</central_repo>
+        <plugin_repo>http://${nexus_server}:8080/nexus/content/groups/public/</plugin_repo>
+        <release_deploy_repo>http://${nexus_server}:8080/nexus/content/repositories/releases/</release_deploy_repo>
+        <snapshot_deploy_repo>http://${nexus_server}:8080/nexus/content/repositories/snapshots/</snapshot_deploy_repo>
+        
+        <rpm.gpg.keyname />
+		<rpm.gpg.keypassphrase />
+		<rpm.packager>PFD_DEV</rpm.packager>
+		<rpm.license>2020, NCR</rpm.license>
+		
+        <perforce_server>p4-1790.prd1.diginsite.net</perforce_server>
+        <perforce_port>9790</perforce_port>
+		<perforce_depotpath>//depot/development/software/pingfederate/main</perforce_depotpath>
+		<perforce_connection>scm:perforce:${perforce_server}:${perforce_port}:${perforce_depotpath}</perforce_connection>
+		<product_team>development</product_team>
+		<product_group_name>pingfederate</product_group_name>
+		<product_branch>main</product_branch>
+		<product_label>${product_team}-${product_group_name}</product_label>
+		<project.build.sourceEncoding>utf-8</project.build.sourceEncoding>
+
+	</properties>
+
+	<issueManagement>
+		<system>{System Name, like Rally, TeamTrack, JIRA, etc}</system>
+		<url>http://{url_to_issue_management_system_and_project_module_home}</url>
+	</issueManagement>
+	<ciManagement>
+		<system>Hudson</system>
+		<url>http://{url_to_continuous_integration_build_system_and_project_module_home}</url>
+	</ciManagement>
+	<scm>
+		<connection>${perforce_connection}</connection>
+	</scm>
+	<organization>
+		<name>Intuit, Inc.</name>
+		<url>http://www.intuit.com</url>
+	</organization>
+	<developers>
+		<developer>
+			<id>{ldap_id}</id>
+			<name>{User name}</name>
+			<email>{email_address}</email>
+			<organization>Intuit, Inc.</organization>
+			<organizationUrl>http://www.intuit.com</organizationUrl>
+			<roles>
+				<role>{role}</role>
+			</roles>
+			<timezone>-8</timezone>
+		</developer>
+	</developers>
+
+	<build>
+		<pluginManagement>
+			<plugins>
+				<plugin>
+					<groupId>org.apache.maven.plugins</groupId>
+					<artifactId>maven-release-plugin</artifactId>
+					<version>2.5.3</version>
+					<configuration>
+						<tagNameFormat>${product_label}-@{project.version}</tagNameFormat>
+					</configuration>
+				</plugin>
+				<plugin>
+					<artifactId>maven-deploy-plugin</artifactId>
+					<version>2.4</version>
+					<configuration>
+						<skip>true</skip>
+					</configuration>
+				</plugin>
+			</plugins>
+		</pluginManagement>
+	</build>
+
+
+	<repositories>
+		<repository>
+			<id>central</id>
+			<url>${central_repo}</url>
+			<releases>
+				<enabled>true</enabled>
+			</releases>
+			<snapshots>
+				<enabled>true</enabled>
+				<updatePolicy>always</updatePolicy>
+			</snapshots>
+		</repository>
+		<repository>
+			<id>apache</id>
+			<url>https://repository.apache.org/content/repositories/snapshots</url>
+		</repository>
+		<repository>
+			<id>default</id>
+			<url>http://repo1.maven.org/maven2</url>
+		</repository>
+	</repositories>
+	<pluginRepositories>
+		<pluginRepository>
+			<id>central</id>
+			<url>${plugin_repo}</url>
+		</pluginRepository>
+	</pluginRepositories>
+
+	<distributionManagement>
+		<repository>
+			<id>release-deploy-repo</id>
+			<name>Release Repo</name>
+			<url>${release_deploy_repo}</url>
+		</repository>
+		<snapshotRepository>
+			<id>snapshot-deploy-repo</id>
+			<name>Snapshot Repo</name>
+			<url>${snapshot_deploy_repo}</url>
+			<uniqueVersion>true</uniqueVersion>
+		</snapshotRepository>
+	</distributionManagement>
+
+	<profiles>
+		<profile>
+			<id>rpm</id>
+			<activation>
+				<activeByDefault>true</activeByDefault>
+			</activation>
+			<build>
+				<plugins>
+					<plugin>
+						<groupId>org.codehaus.mojo</groupId>
+						<artifactId>rpm-maven-plugin</artifactId>
+						<version>2.2.0</version>
+						<extensions>true</extensions>
+						<executions>
+							<execution>
+								<phase>deploy</phase>
+								<goals>
+									<goal>version</goal>
+									<goal>rpm</goal>
+								</goals>
+							</execution>
+						</executions>
+						<configuration>
+							<group>pingfederate</group>
+							<name>pingfederate-server</name>
+							<packager>{rpm.packager}</packager>
+							<license>{rpm.copyright}</license>
+							<versionProperty>rpmartifactVersion</versionProperty>
+                			<releaseProperty>rpmartifactRelease</releaseProperty>
+							<needarch>false</needarch>
+                            <description>PFD</description>
+                            <properties>
+								<project.build.sourceEncoding>utf-8</project.build.sourceEncoding>
+							</properties>
+							<mappings>
+								<mapping>
+									<directory>/usr/local/tools</directory>
+									<filemode>775</filemode>
+									<username>app</username>
+									<groupname>appadmin</groupname>
+									<sources>
+										<source>
+											<location>install/bash</location>
+										</source>
+									</sources>
+								</mapping>
+								<mapping>
+									<directory>/usr/local/staging</directory>
+									<filemode>775</filemode>
+									<username>app</username>
+									<groupname>appadmin</groupname>
+									<sources>
+										<source>
+											<location>install</location>
+										</source>
+									</sources>
+								</mapping>
+								<mapping>
+									<directory>/usr/local/config</directory>
+									<filemode>775</filemode>
+									<username>app</username>
+									<groupname>appadmin</groupname>
+									<directoryIncluded>true</directoryIncluded>	
+								</mapping>
+							</mappings>
+
+							<preinstallScriptlet>
+								<scriptFile>install/bash/pre-install.sh</scriptFile>
+							</preinstallScriptlet>
+							<preremoveScriptlet>
+								<scriptFile>install/bash/pre-remove.sh</scriptFile>
+							</preremoveScriptlet>
+							<postremoveScriptlet>
+								<scriptFile>install/bash/post-remove.sh</scriptFile>
+							</postremoveScriptlet>
+						</configuration>
+					</plugin>
+					<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-deploy-plugin</artifactId>
+				<version>2.8.2</version>
+				<executions>
+					<execution>
+						<id>deploy-default</id>
+						<phase>deploy</phase>
+						<goals>
+							<goal>deploy-file</goal>
+						</goals>
+					</execution>
+				</executions>
+				<configuration>
+					<repositoryId>rpm-repo</repositoryId>
+					<url>https://ncr.jfrog.io/ncr/digitalbanking-rpm-group</url>
+					<artifactId>${project.artifactId}</artifactId>
+					<groupId>${project.groupId}</groupId>
+					<version>${rpmartifactVersion}-${rpmartifactRelease}.noarch</version>
+					<file>
+						target/rpm/pingfederate-server/RPMS/noarch/pingfederate-server-${rpmartifactVersion}-${rpmartifactRelease}.noarch.rpm
+					</file>
+				</configuration>
+			</plugin>
+				</plugins>
+			</build>
+		</profile>
+		<profile>
+			<id>rpm-signer</id>
+			<build>
+				<plugins>
+					<plugin>
+						<artifactId>maven-compiler-plugin</artifactId>
+						<version>2.3.2</version>
+						<configuration>
+							<source>1.8</source>
+							<target>1.8</target>
+						</configuration>
+					</plugin>
+					<plugin>
+						<groupId>org.codehaus.mojo</groupId>
+						<artifactId>rpm-maven-plugin</artifactId>
+						<version>2.2.0</version>
+						<extensions>true</extensions>
+						<configuration>
+							<keyname>${rpm.gpg.keyname}</keyname>
+							<keyPassphrase>
+								<passphrase>${rpm.gpg.keypassphrase}</passphrase>
+							</keyPassphrase>
+						</configuration>
+					</plugin>
+				</plugins>
+			</build>
+		</profile>
+		<profile>
+			<id>fortify</id>
+			<build>
+				<plugins>
+					<plugin>
+						<groupId>com.fortify.ps.maven.plugin</groupId>
+						<artifactId>sca-maven-plugin</artifactId>
+						<version>${fortifyVersion}</version>
+						<configuration>
+							<buildId>${project.artifactId}-${project.version}</buildId>
+							<maxHeap>1200M</maxHeap>
+							<debug>true</debug>
+							<source>1.6</source>
+							<toplevelArtifactId>${project.artifactId}</toplevelArtifactId>
+							<logfile>${project.build.directory}/fortify/sca-scan.log</logfile>
+							<resultsFile>${project.build.directory}/fortify/${project.artifactId}.fpr</resultsFile>
+							<htmlReport>false</htmlReport>
+						</configuration>
+						<executions>
+							<execution>
+								<phase>package</phase>
+								<goals>
+									<goal>clean</goal>
+									<goal>translate</goal>
+									<goal>scan</goal>
+								</goals>
+							</execution>
+						</executions>
+					</plugin>
+				</plugins>
+			</build>
+		</profile>
+	</profiles>
+</project>

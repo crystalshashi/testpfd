@@ -1,0 +1,5 @@
+Client: __P4CLIENT_____HOSTNAME__
+Root:  __P4CLIENT_ROOT_DIRECTORY__
+Options: noallwrite noclobber nocompress unlocked nomodtime normdir
+View:
+	__P4_CONFIGS_VIEW__ //__P4CLIENT_____HOSTNAME__/...
